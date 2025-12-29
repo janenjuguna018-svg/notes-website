@@ -14,24 +14,43 @@
   </nav>
 </header>
 
-<main>
-
-  <div class="card">
-    <h3>Mathematics</h3>
-    <a class="btn" href="#">Download PDF</a>
-  </div>
-
-  <div class="card">
-    <h3>English</h3>
-    <a class="btn" href="#">Download PDF</a>
-  </div>
-
-  <div class="card">
-    <h3>Science</h3>
-    <a class="btn" href="#">Download PDF</a>
-  </div>
-
+<main id="notes-list">
+  <p>Loading notes...</p>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = 'https://zbmxjwlciatnjdqjfgua.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpibXhqd2xjaWF0bmpkcWpmZ3VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5ODkwMjcsImV4cCI6MjA4MjU2NTAyN30.CdMhb-CJnLN804H84wiaH5gZhuMj13ruoPJhbsSW7_8';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+  async function loadNotes() {
+    const { data, error } = await supabase.storage.from('notes').list('');
+    const container = document.getElementById('notes-list');
+    container.innerHTML = '';
+
+    if(error){
+      container.innerHTML = 'Error loading notes';
+      console.log(error);
+      return;
+    }
+
+    if(data.length === 0){
+      container.innerHTML = '<p>No notes uploaded yet.</p>';
+      return;
+    }
+
+    data.forEach(file => {
+      const url = supabase.storage.from('notes').getPublicUrl(file.name).data.publicUrl;
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `<h3>${file.name}</h3><a class="btn" href="${url}" target="_blank">Download</a>`;
+      container.appendChild(card);
+    });
+  }
+
+  loadNotes();
+</script>
 
 <footer>
   <p>Happy studying 📚</p>
