@@ -8,24 +8,42 @@
 
 <header>
   <h1>Upload Notes</h1>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="notes.html">Notes</a>
-  </nav>
 </header>
 
-<main>
-
-  <div class="card">
-    <h3>Select File</h3>
-    <form>
-      <input type="file"><br><br>
-      <button>Upload</button>
-    </form>
-    <p><b>Note:</b> Upload works when connected to a server.</p>
-  </div>
-
+<main class="card">
+  <input type="file" id="file"><br><br>
+  <button onclick="uploadFile()">Upload</button>
+  <p id="status"></p>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = 'YOUR_SUPABASE_URL';
+  const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+  async function uploadFile() {
+    const fileInput = document.getElementById('file');
+    const file = fileInput.files[0];
+    if(!file){
+      alert('Select a file first!');
+      return;
+    }
+
+    const { data, error } = await supabase.storage
+      .from('notes')
+      .upload(file.name, file);
+
+    if(error){
+      document.getElementById('status').innerText = 'Upload failed!';
+      console.log(error);
+    } else {
+      document.getElementById('status').innerHTML = 
+        'Upload successful! <br><a href="https://YOUR_SUPABASE_URL/storage/v1/object/public/notes/' 
+        + encodeURIComponent(file.name) + '" target="_blank">Download File</a>';
+    }
+  }
+</script>
 
 </body>
 </html>
