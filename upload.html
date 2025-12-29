@@ -1,4 +1,4 @@
-<!<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>Upload Notes</title>
@@ -8,6 +8,10 @@
 
 <header>
   <h1>Upload Notes</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="notes.html">Notes</a>
+  </nav>
 </header>
 
 <main class="card">
@@ -17,6 +21,12 @@
   <button onclick="login()">Login</button>
 
   <div id="upload-section" style="display:none; margin-top:20px;">
+    <label>Choose Subject:</label><br>
+    <select id="subject">
+      <option value="Math">Math</option>
+      <option value="English">English</option>
+      <option value="Science">Science</option>
+    </select><br><br>
     <input type="file" id="file"><br><br>
     <button onclick="uploadFile()">Upload</button>
     <p id="status"></p>
@@ -25,12 +35,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Connect to your Supabase project
-  const supabaseUrl = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpibXhqd2xjaWF0bmpkcWpmZ3VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5ODkwMjcsImV4cCI6MjA4MjU2NTAyN30.CdMhb-CJnLN804H84wiaH5gZhuMj13ruoPJhbsSW7_8';
+  const supabaseUrl = 'YOUR_SUPABASE_URL';
+  const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
   const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-  // Admin login
   async function login() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -44,7 +52,6 @@
     }
   }
 
-  // Upload file
   async function uploadFile() {
     const user = supabase.auth.user();
     if(!user){
@@ -54,23 +61,28 @@
 
     const fileInput = document.getElementById('file');
     const file = fileInput.files[0];
+    const subject = document.getElementById('subject').value;
+
     if(!file){
       alert('Select a file first!');
       return;
     }
 
-    const { data, error } = await supabase.storage.from('notes').upload(file.name, file);
+    const { data, error } = await supabase.storage.from('notes').upload(`${subject}/${file.name}`, file);
 
     if(error){
       document.getElementById('status').innerText = 'Upload failed!';
       console.log(error);
     } else {
-      const url = supabase.storage.from('notes').getPublicUrl(file.name).data.publicUrl;
-      document.getElementById('status').innerHTML = 
-        'Upload successful! <br><a href="' + url + '" target="_blank">Download File</a>';
+      const url = supabase.storage.from('notes').getPublicUrl(`${subject}/${file.name}`).data.publicUrl;
+      document.getElementById('status').innerHTML = `Upload successful! <br><a href="${url}" target="_blank">Download File</a>`;
     }
   }
 </script>
+
+<footer>
+  <p>© 2025 Friends Notes Hub</p>
+</footer>
 
 </body>
 </html>
