@@ -20,11 +20,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const supabaseUrl = 'https://zbmxjwlciatnjdqjfgua.supabase.co';
+  const supabaseUrl = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpibXhqd2xjaWF0bmpkcWpmZ3VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5ODkwMjcsImV4cCI6MjA4MjU2NTAyN30.CdMhb-CJnLN804H84wiaH5gZhuMj13ruoPJhbsSW7_8';
   const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
   async function loadNotes() {
+    // Fetch all files from the 'notes' bucket
     const { data, error } = await supabase.storage.from('notes').list('');
     const container = document.getElementById('notes-list');
     container.innerHTML = '';
@@ -40,6 +41,7 @@
       return;
     }
 
+    // Loop through files and create download links
     data.forEach(file => {
       const url = supabase.storage.from('notes').getPublicUrl(file.name).data.publicUrl;
       const card = document.createElement('div');

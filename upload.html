@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!<!DOCTYPE html>
 <html>
 <head>
   <title>Upload Notes</title>
@@ -8,25 +8,50 @@
 
 <header>
   <h1>Upload Notes</h1>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="notes.html">Notes</a>
-  </nav>
 </header>
 
 <main class="card">
-  <input type="file" id="file"><br><br>
-  <button onclick="uploadFile()">Upload</button>
-  <p id="status"></p>
+  <h3>Admin Login</h3>
+  <input type="email" id="email" placeholder="Email"><br><br>
+  <input type="password" id="password" placeholder="Password"><br><br>
+  <button onclick="login()">Login</button>
+
+  <div id="upload-section" style="display:none; margin-top:20px;">
+    <input type="file" id="file"><br><br>
+    <button onclick="uploadFile()">Upload</button>
+    <p id="status"></p>
+  </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const supabaseUrl = 'https://zbmxjwlciatnjdqjfgua.supabase.co';
+  // Connect to your Supabase project
+  const supabaseUrl = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpibXhqd2xjaWF0bmpkcWpmZ3VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5ODkwMjcsImV4cCI6MjA4MjU2NTAyN30.CdMhb-CJnLN804H84wiaH5gZhuMj13ruoPJhbsSW7_8';
   const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+  // Admin login
+  async function login() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if(error){
+      alert('Login failed!');
+      console.log(error);
+    } else {
+      alert('Login successful!');
+      document.getElementById('upload-section').style.display = 'block';
+    }
+  }
+
+  // Upload file
   async function uploadFile() {
+    const user = supabase.auth.user();
+    if(!user){
+      alert('You must login first!');
+      return;
+    }
+
     const fileInput = document.getElementById('file');
     const file = fileInput.files[0];
     if(!file){
@@ -46,10 +71,6 @@
     }
   }
 </script>
-
-<footer>
-  <p>© 2025 Friends Notes Hub</p>
-</footer>
 
 </body>
 </html>
